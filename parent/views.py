@@ -21,17 +21,28 @@ def get_active_user_count():
 def index(request):
     for key, value in request.session.items():
         print('{} => {}'.format(key, value))
-    if request.user.is_authenticated:
-        request.session['username'] = request.user.username
-    else:
-        request.session['username'] = 'Anonymous'
+    # if request.user.is_authenticated:
+    #     request.session['username'] = request.user.username
+    # else:
+    #     request.session['username'] = 'Anonymous'
 
-    count = request.session.get('visit_count', 0)
-    request.session['visit_count'] = count + 1
+    # count = request.session.get('visit_count', 0)
+    # request.session['visit_count'] = count + 1
 
-    context = {'username': request.session['username'], 'visit_count': count}
-    return render(request, 'home.html', context)
+    # context = {'username': request.session['username'], 'visit_count': count}
+    return render(request, 'home.html')
 
+def user_login(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+        else:
+            return render(request, 'login.html', {'error': 'Invalid credentials'})
+    return render(request, 'login.html')
 
 @csrf_exempt
 def login_(request):
@@ -116,8 +127,8 @@ from django.contrib.auth import logout
 def logout_view(request):
     logout(request)
     # Redirect to a success page.
-    form = UserRegisterForm()
-    return render(request, 'register.html', {'form': form})
+    #form = UserRegisterForm()
+    return redirect( 'home')
 
 from .token import CustomAccessToken  # Import the custom token class
 def login_as_user(request, username):
