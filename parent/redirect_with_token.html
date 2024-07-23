@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+</head>
+<body>
+    <p>Redirecting, please wait...</p>
+    <script>
+        const token = "{{ token }}";
+        const flaskAppUrl = "{{ flask_app_url }}";
+
+        fetch(flaskAppUrl, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.logged_in_as) {
+                localStorage.setItem('jwtToken', token);
+                // window.location.href = "http://127.0.0.1:5000/";
+                window.location.href = "http://127.0.0.1:8000/parent/"; // Redirect after the request is successful
+                window.close();
+            } else {
+                alert('Login failed');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    </script>
+</body>
+</html>

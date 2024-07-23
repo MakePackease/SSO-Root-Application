@@ -1,0 +1,41 @@
+<!-- logged_in_users_popup.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Logged-In Users</title>
+</head>
+<body>
+    <h1>Currently Logged-In Users</h1>
+    <ul id="user-list">
+        <!-- User list will be populated here by JavaScript -->
+    </ul>
+</body>
+<script>
+    // Function to fetch logged-in users and populate the list
+    function fetchLoggedInUsers() {
+        const li = document.createElement('p');
+        li.textContent = "Loading ... ";
+        document.getElementById('user-list').appendChild(li);
+        fetch("{% url 'get_logged_in_users' %}")
+            .then(response => response.json())
+            .then(data => {
+                const userList = document.getElementById('user-list');
+                userList.innerHTML = '';
+                data.forEach(user => {
+                    const li = document.createElement('li');
+                    const link = document.createElement('a');
+                    link.href = `/parent/login_as_user/${user}/`; // Adjust the URL pattern as needed
+                    link.textContent = user;
+                    li.appendChild(link);
+                    // li.textContent = user.username;
+                    // li.textContent = user;
+                    userList.appendChild(li);
+                });
+            });
+    }
+    console.log("Fetched logged-in users")
+    // Call the function on page load
+    document.addEventListener('DOMContentLoaded', fetchLoggedInUsers);
+</script>
+</html>

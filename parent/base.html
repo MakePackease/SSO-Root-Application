@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Django App</title>
+</head>
+<body>
+    <button onclick="openPopup()">Show Logged-In Users</button>
+</body>
+<script>
+    let popupWindow;
+
+    function openPopup() {
+        // Open the popup window
+        popupWindow = window.open("{% url 'logged_in_users_popup' %}", "Logged-In Users", "width=600,height=400");
+
+        // Attach an event listener to detect when the popup window is closed
+        if (popupWindow) {
+            // Poll the popup window to check if it's closed
+            const checkClosed = setInterval(function() {
+                if (popupWindow.closed) {
+                    clearInterval(checkClosed); // Stop polling
+                    console.log('Popup window closed');
+                    // Redirect the main window
+                    // window.location.href = "http://127.0.0.1:5000/"; // Replace with your desired URL
+                    const token = localStorage.getItem('jwtToken'); // Get token from local storage or other source
+                    if (token) {
+                        fetch('http://127.0.0.1:5000/protected', {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            // Handle the response data if needed
+                            console.log('Response:', data);
+                            window.location.href = "http://127.0.0.1:8000/parent/"; // Redirect after the request is successful
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                    } else {
+                        console.error('Token not found');
+                    }
+                    console.log(token)
+                }
+            }, 1000); // Adjust the polling interval as needed
+        }
+    }
+</script>
+</html>
